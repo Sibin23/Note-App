@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:note_app/core/constants/colors.dart';
 import 'package:note_app/core/constants/constants.dart';
 import 'package:note_app/core/navigation/navigation_service.dart';
-import 'package:note_app/presentation/add_screen/screen_todo_add.dart';
-import 'package:note_app/presentation/edit_screen/screen_todo_edit.dart';
+import 'package:note_app/presentation/bloc/note_bloc.dart';
+import 'package:note_app/presentation/screens/add_screen/screen_todo_add.dart';
+import 'package:note_app/presentation/screens/edit_screen/screen_todo_edit.dart';
 
 class ScreenHome extends StatelessWidget {
   const ScreenHome({super.key});
@@ -12,6 +14,7 @@ class ScreenHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    context.read<NoteBloc>().add(GetallNotesEvent());
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -53,8 +56,8 @@ class ScreenHome extends StatelessWidget {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: completedBg),
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: completedBg),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
