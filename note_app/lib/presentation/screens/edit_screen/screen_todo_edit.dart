@@ -2,14 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:note_app/core/constants/colors.dart';
 import 'package:note_app/core/constants/constants.dart';
 
-class ScreenTodoEdit extends StatelessWidget {
-  const ScreenTodoEdit({super.key});
+class ScreenTodoEdit extends StatefulWidget {
+  const ScreenTodoEdit(
+      {super.key,
+      required this.isCompleted,
+      required this.title,
+      required this.description});
+  final bool isCompleted;
+  final String title;
+  final String description;
+
+  @override
+  State<ScreenTodoEdit> createState() => _ScreenTodoEditState();
+}
+
+class _ScreenTodoEditState extends State<ScreenTodoEdit> {
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  @override
+  void initState() {
+    titleController.text = widget.title;
+    descriptionController.text = widget.description;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    TextEditingController titleController = TextEditingController();
-    TextEditingController subjectController = TextEditingController();
+
+    bool _isCompleted = widget.isCompleted;
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: whitecolor,
@@ -57,7 +78,7 @@ class ScreenTodoEdit extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
-                      controller: subjectController,
+                      controller: descriptionController,
                       maxLines: 6,
                       decoration: InputDecoration(
                           hintStyle: hintTextStyle,

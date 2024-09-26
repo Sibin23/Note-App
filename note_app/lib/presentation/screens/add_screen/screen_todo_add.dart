@@ -1,22 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lottie/lottie.dart';
+import 'package:http/http.dart' as http;
 import 'package:note_app/core/constants/colors.dart';
 import 'package:note_app/core/constants/constants.dart';
-import 'package:note_app/presentation/bloc/note_bloc.dart';
+import 'package:note_app/core/constants/strings.dart';
+import 'package:note_app/core/navigation/navigation_service.dart';
+import 'package:note_app/presentation/bloc/todo_bloc.dart';
 
 class ScreenTodoAdd extends StatefulWidget {
   const ScreenTodoAdd({
     super.key,
-    this.add = true,
-    this.description,
-    this.title,
-    this.id,
   });
-  final bool add;
-  final String? title;
-  final String? description;
-  final int? id;
 
   @override
   State<ScreenTodoAdd> createState() => _ScreenTodoAddState();
@@ -24,57 +20,25 @@ class ScreenTodoAdd extends StatefulWidget {
 
 class _ScreenTodoAddState extends State<ScreenTodoAdd> {
   TextEditingController titleController = TextEditingController();
-  TextEditingController subjectController = TextEditingController();
-  @override
-  void initState() {
-    if (widget.title != null && widget.description != null) {
-      titleController.text = widget.title!;
-      subjectController.text = widget.description!;
-    }
-    super.initState();
-  }
-
+  TextEditingController descriptionController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return BlocConsumer<NoteBloc, NoteState>(listener: (context, state) {
-      if (state is ErrorState) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.red.shade300,
-            duration: const Duration(seconds: 1),
-            content: Text(state.errorMessage),
-          ),
-        );
-      }
-      if (state is ScuccessState) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.green.shade300,
-            duration: const Duration(seconds: 1),
-            content: state.add
-                ? const Text("Note Added")
-                : const Text("Note Edited"),
-          ),
-        );
-        state.add
-            ? Navigator.pop(context)
-            : Navigator.of(context).popUntil((route) => route.isFirst);
-      }
-    }, builder: (context, state) {
-      return Scaffold(
+    return Scaffold(
         appBar: AppBar(
           surfaceTintColor: whitecolor,
           centerTitle: true,
-          title: Text(widget.add ? "Add Note" : "Edit Note"),
+          title: const Text('Add Note'),
         ),
         body: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(10.0),
-              child: ListView(
-                children: [
+              child: Form(
+                key: formKey,
+                child: ListView(children: [
                   const SizedBox(
                     height: 100,
                   ),
@@ -109,7 +73,7 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
-                        controller: subjectController,
+                        controller: descriptionController,
                         maxLines: 6,
                         decoration: InputDecoration(
                             hintStyle: hintTextStyle,
@@ -132,42 +96,49 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                         height: 50,
                         color: Colors.grey.shade200,
                         onPressed: () async {
-                          widget.add
-                              ? context.read<NoteBloc>().add(
-                                    NoteAddEvent(
-                                      title: titleController.text,
-                                      content: subjectController.text,
-                                      isCompleted: false,
-                                    ),
-                                  )
-                              : context.read<NoteBloc>().add(
-                                    NoteEditEvent(
-                                      title: titleController.text,
-                                      content: subjectController.text,
-                                      id: widget.id!,
-                                    ),
-                                  );
+                          validate(context);
                         },
-                        child: BlocBuilder<NoteBloc, NoteState>(
-                          builder: (context, state) {
-                            if (state is LoadingState) {
-                              return Lottie.asset(
-                                "assets/butttonloading.json",
-                                width: 40,
-                              );
-                            }
-                            return const Text("Save");
-                          },
-                        ),
+                        child: const Text("Save"),
                       ),
                     ),
-                  )
-                ],
+                  ),
+                ]),
               ),
             ),
           ),
-        ),
-      );
-    });
+        ));
+  }
+
+  void validate(BuildContext context) async {
+    if (formKey.currentState!.validate()) {
+      try {
+        // context.read<NoteBloc>().add(NoteAddEvent(
+        //     title: titleController.text, content: descriptionController.text));
+        // NavigationService.instance.goBack();
+        final body = {
+          'title': titleController.text.trim(),
+          'description': descriptionController.text.trim(),
+          'is_completed': 'false',
+        };
+        final response = await http.post(Uri.parse(baseUrl),
+            body: jsonEncode(body),
+            headers: {'Content-Type': ' application/json'});
+        if (response.statusCode == 201) {
+          print("Todo Created");
+          showSuccessSnackBar('Added Successfully', greenColor);
+        } else {
+          print('Failed to create todo ${response.statusCode}');
+          showSuccessSnackBar('Failed to create Todo', Colors.red);
+        }
+      } catch (e) {
+        print(e.toString());
+      }
+      formKey.currentState!.reset();
+    }
+  }
+
+  showSuccessSnackBar(String message, Color color) {
+    final snackBar = SnackBar(backgroundColor: color, content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
