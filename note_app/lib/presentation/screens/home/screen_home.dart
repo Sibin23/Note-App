@@ -6,6 +6,7 @@ import 'package:note_app/core/navigation/navigation_service.dart';
 import 'package:note_app/presentation/bloc/todo_bloc.dart';
 import 'package:note_app/presentation/screens/add_screen/screen_todo_add.dart';
 import 'package:note_app/presentation/screens/home/widget/todo_card_widget.dart';
+import 'package:note_app/presentation/screens/todo_screen/screen_todo.dart';
 
 class ScreenHome extends StatelessWidget {
   const ScreenHome({super.key});
@@ -46,11 +47,6 @@ class ScreenHome extends StatelessWidget {
                     : TodoCardWidget(
                         size: size,
                         todoList: state.todos,
-                        voidCallback: () {
-                         AlertDialog(
-                          title: Text("Delete",),
-                         );
-                        },
                       );
               }
               return const SizedBox();
@@ -63,7 +59,7 @@ class ScreenHome extends StatelessWidget {
           shape: const CircleBorder(),
           onPressed: () =>
               NavigationService.instance.navigate(const ScreenTodoAdd()),
-          child: Icon(Icons.add)),
+          child: const Icon(Icons.add)),
     );
   }
 }

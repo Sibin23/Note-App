@@ -8,3 +8,5 @@ const hintTextColor = Color.fromARGB(255, 217, 163, 0);
 final pendingBg = Colors.amber.shade100;
 final pendingTextColor = Colors.amber.shade600;
 final completedBg = Colors.green.shade100;
+const redColor = Colors.red;
+const blueColor = Colors.blue;

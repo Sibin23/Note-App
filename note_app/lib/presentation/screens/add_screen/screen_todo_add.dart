@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:note_app/core/constants/colors.dart';
 import 'package:note_app/core/constants/constants.dart';
+import 'package:note_app/core/navigation/navigation_service.dart';
 import 'package:note_app/presentation/bloc/todo_bloc.dart';
 
 class ScreenTodoAdd extends StatefulWidget {
@@ -20,6 +22,7 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+
     return Scaffold(
         appBar: AppBar(
           surfaceTintColor: whitecolor,
@@ -48,6 +51,12 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Title is requred';
+                          }
+                          return null;
+                        },
                         controller: titleController,
                         decoration: InputDecoration(
                             hintStyle: hintTextStyle,
@@ -68,13 +77,19 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Note content is required';
+                          }
+                          return null;
+                        },
                         controller: descriptionController,
                         maxLines: 6,
                         decoration: InputDecoration(
                             hintStyle: hintTextStyle,
                             hintText: 'Write a note..',
                             border: InputBorder.none,
-                            disabledBorder: OutlineInputBorder()),
+                            disabledBorder: const OutlineInputBorder()),
                       ),
                     ),
                   ),
@@ -82,7 +97,9 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                   SizedBox(
                     width: size.width,
                     child: Center(
-                      child: BlocConsumer<TodoBloc, TodoState>(
+                      child: BlocBuilder<TodoBloc, TodoState>(
+                        buildWhen: (previous, currentState) =>
+                            currentState is NoteAddEvent,
                         builder: (context, state) {
                           return MaterialButton(
                             elevation: 1,
@@ -99,29 +116,29 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                                     description:
                                         descriptionController.text.trim(),
                                     isCompleted: false));
+                                if (state is TodoSuccess) {
+                                  titleController.clear();
+                                  descriptionController.clear();
+                                  NavigationService.instance.goBack();
+                                  customSnackBar(
+                                      context,
+                                      "Todo Added Successfully",
+                                      greenColor,
+                                      blackColor);
+                                }
+                                if (state is TodoError) {
+                                  customSnackBar(
+                                      context,
+                                      "Failed To Create Todo",
+                                      redColor,
+                                      blackColor);
+                                }
                               }
                             },
-                            child:
-                                Text(state is TodoLoading ? 'Loading' : "Save"),
+                            child: Text(
+                                state is TodoLoading ? "Loading" : "Save",
+                                style: buttonText),
                           );
-                        },
-                        listener: (context, state) {
-                          if (state is TodoSuccess) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Todo added successfully!'),
-                              ),
-                            );
-                            titleController.clear();
-                            descriptionController.clear();
-                          } else if (state is TodoError) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('Error adding todo: ${state.message}'),
-                              ),
-                            );
-                          }
                         },
                       ),
                     ),
@@ -132,4 +149,14 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
           ),
         ));
   }
+}
+
+customSnackBar(
+    BuildContext context, String message, Color bg, Color textColor) {
+  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: bg,
+      content: Text(
+        message,
+        style: GoogleFonts.roboto(color: textColor),
+      )));
 }

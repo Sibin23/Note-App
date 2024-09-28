@@ -23,7 +23,7 @@ class TodoUpdateEvent extends NoteEvent {
 }
 
 class TodoDeleteEvent extends NoteEvent {
-  final Todo todo;
+  final String id;
 
-  TodoDeleteEvent({required this.todo});
+  TodoDeleteEvent({required this.id});
 }

@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:note_app/core/constants/colors.dart';
 import 'package:note_app/core/constants/constants.dart';
+import 'package:note_app/core/navigation/navigation_service.dart';
 import 'package:note_app/domain/models/todo_model.dart';
+import 'package:note_app/presentation/screens/todo_screen/screen_todo.dart';
 
 class TodoCardWidget extends StatelessWidget {
   const TodoCardWidget({
     super.key,
-    required this.size, required this.todoList, required this.voidCallback,
+    required this.size,
+    required this.todoList,
   });
-final List<Todo> todoList;
+  final List<Todo> todoList;
   final Size size;
-  final VoidCallback voidCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,9 @@ final List<Todo> todoList;
         itemBuilder: (context, index) {
           return InkWell(
             onTap: () {
-              voidCallback();
+              NavigationService.instance.navigate(ScreenTodo(
+                todo: todoList[index],
+              ));
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -38,12 +42,10 @@ final List<Todo> todoList;
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             todoList[index].title,
@@ -51,31 +53,22 @@ final List<Todo> todoList;
                           ),
                           Container(
                             decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.circular(8),
-                                color: todoList[index]
-                                            .isCompleted ==
-                                        false
+                                borderRadius: BorderRadius.circular(8),
+                                color: todoList[index].isCompleted == false
                                     ? pendingBg
                                     : completedBg),
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                todoList[index]
-                                            .isCompleted ==
-                                        false
+                                todoList[index].isCompleted == false
                                     ? 'PENDING'
                                     : 'COMPLETED',
                                 style: GoogleFonts.roboto(
                                     fontSize: 16,
-                                    color: todoList[index]
-                                                .isCompleted ==
-                                            false
+                                    color: todoList[index].isCompleted == false
                                         ? pendingTextColor
                                         : greenColor,
-                                    fontWeight:
-                                        FontWeight.bold),
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                           )
@@ -86,8 +79,7 @@ final List<Todo> todoList;
                           width: size.width,
                           child: Text(
                             todoList[index].description,
-                            style: GoogleFonts.roboto(
-                                fontSize: 15),
+                            style: GoogleFonts.roboto(fontSize: 15),
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                           ))

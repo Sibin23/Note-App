@@ -1,8 +1,9 @@
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:note_app/core/constants/strings.dart';
 import 'package:note_app/domain/models/todo_model.dart';
-import 'package:note_app/presentation/bloc/todo_bloc.dart';
 
 class ApiServices {
   static const String endpoint = "https://api.nstack.in/v1/todos";
@@ -40,13 +41,65 @@ class ApiServices {
           headers: {'Content-Type': 'application/json'});
 
       if (response.statusCode == 201) {
-        print("Todo Created");
+        if (kDebugMode) {
+          print("Todo Created");
+        }
       } else {
-        print('Failed to create todo ${response.statusCode}');
+        if (kDebugMode) {
+          print('Failed to create todo ${response.statusCode}');
+        }
       }
     } catch (e) {
-      print('Error creating todo: $e');
+      if (kDebugMode) {
+        print('Error creating todo: $e');
+      }
       throw Exception('Failed to create todo');
+    }
+  }
+
+  static Future<void> updateTodo(Todo todo) async {
+    final body = {
+      'title': todo.title,
+      'description': todo.description,
+      'is_completed': todo.isCompleted,
+    };
+    try {
+      final response = await http.put(Uri.parse(baseUrl + todo.id.toString()),
+          body: jsonEncode(body),
+          headers: {'Content-Type': 'application/json'});
+      if (response.statusCode == 201) {
+        if (kDebugMode) {
+          print("Todo Updated Successfully");
+        }
+      } else {
+        if (kDebugMode) {
+          print("Failed to Update Todo");
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating todo: $e');
+      }
+      throw Exception('Failed to Update Todo');
+    }
+  }
+
+  static Future<void> deleteTodo(String id) async {
+    try {
+      final response = await http.delete(Uri.parse('$baseUrl/$id'));
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          print("Todo Deleted");
+        }
+      } else {
+        if (kDebugMode) {
+          print('Failed to Delete Todo');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error Deleting Todo $e");
+      }
     }
   }
 }
