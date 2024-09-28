@@ -8,7 +8,7 @@ class ScreenTodoEdit extends StatefulWidget {
       required this.isCompleted,
       required this.title,
       required this.description});
-  final bool isCompleted;
+  final String isCompleted;
   final String title;
   final String description;
 
@@ -30,7 +30,7 @@ class _ScreenTodoEditState extends State<ScreenTodoEdit> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    bool _isCompleted = widget.isCompleted;
+    String _isCompleted = widget.isCompleted;
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: whitecolor,

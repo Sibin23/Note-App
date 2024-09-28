@@ -22,6 +22,6 @@ class NavigationService {
   }
 
   goBack() {
-    return navigationKey.currentState!.pop();
+     navigationKey.currentState!.pop();
   }
 }

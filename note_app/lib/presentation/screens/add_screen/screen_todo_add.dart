@@ -1,12 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'package:note_app/core/constants/colors.dart';
 import 'package:note_app/core/constants/constants.dart';
-import 'package:note_app/core/constants/strings.dart';
-import 'package:note_app/core/navigation/navigation_service.dart';
 import 'package:note_app/presentation/bloc/todo_bloc.dart';
 
 class ScreenTodoAdd extends StatefulWidget {
@@ -87,18 +82,47 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                   SizedBox(
                     width: size.width,
                     child: Center(
-                      child: MaterialButton(
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        splashColor: whitecolor,
-                        minWidth: size.width * 2 / 4,
-                        height: 50,
-                        color: Colors.grey.shade200,
-                        onPressed: () async {
-                          validate(context);
+                      child: BlocConsumer<TodoBloc, TodoState>(
+                        builder: (context, state) {
+                          return MaterialButton(
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            splashColor: whitecolor,
+                            minWidth: size.width * 2 / 4,
+                            height: 50,
+                            color: Colors.grey.shade200,
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                context.read<TodoBloc>().add(NoteAddEvent(
+                                    title: titleController.text.trim(),
+                                    description:
+                                        descriptionController.text.trim(),
+                                    isCompleted: false));
+                              }
+                            },
+                            child:
+                                Text(state is TodoLoading ? 'Loading' : "Save"),
+                          );
                         },
-                        child: const Text("Save"),
+                        listener: (context, state) {
+                          if (state is TodoSuccess) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Todo added successfully!'),
+                              ),
+                            );
+                            titleController.clear();
+                            descriptionController.clear();
+                          } else if (state is TodoError) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text('Error adding todo: ${state.message}'),
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ),
                   ),
@@ -107,38 +131,5 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
             ),
           ),
         ));
-  }
-
-  void validate(BuildContext context) async {
-    if (formKey.currentState!.validate()) {
-      try {
-        // context.read<NoteBloc>().add(NoteAddEvent(
-        //     title: titleController.text, content: descriptionController.text));
-        // NavigationService.instance.goBack();
-        final body = {
-          'title': titleController.text.trim(),
-          'description': descriptionController.text.trim(),
-          'is_completed': 'false',
-        };
-        final response = await http.post(Uri.parse(baseUrl),
-            body: jsonEncode(body),
-            headers: {'Content-Type': ' application/json'});
-        if (response.statusCode == 201) {
-          print("Todo Created");
-          showSuccessSnackBar('Added Successfully', greenColor);
-        } else {
-          print('Failed to create todo ${response.statusCode}');
-          showSuccessSnackBar('Failed to create Todo', Colors.red);
-        }
-      } catch (e) {
-        print(e.toString());
-      }
-      formKey.currentState!.reset();
-    }
-  }
-
-  showSuccessSnackBar(String message, Color color) {
-    final snackBar = SnackBar(backgroundColor: color, content: Text(message));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

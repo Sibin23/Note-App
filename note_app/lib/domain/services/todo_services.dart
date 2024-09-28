@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:note_app/domain/models/todo_model.dart';
+import 'package:note_app/presentation/bloc/todo_bloc.dart';
 
 class ApiServices {
   static const String endpoint = "https://api.nstack.in/v1/todos";
@@ -11,29 +13,31 @@ class ApiServices {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print("RESponse data is $responseData");
+
         final List<dynamic> items = responseData['items'];
-        print("Items is $items");
+
         return items.map((json) => Todo.fromJson(json)).toList();
       } else {
         throw Exception('Failed to fetch todos');
       }
     } catch (e) {
-      print('Error fetching todos: $e');
+      if (kDebugMode) {
+        print('Error fetching todos: $e');
+      }
       throw Exception('Failed to fetch todos');
     }
   }
 
   static Future<void> createTodo(Todo todo) async {
+    final body = {
+      'title': todo.title,
+      'description': todo.description,
+      'is_completed': todo.isCompleted,
+    };
     try {
-      final response = await http.post(
-        Uri.parse(endpoint),
-        body: {
-          'title': todo.title,
-          'description': todo.description,
-          'is_completed': 'false', 
-        },
-      );
+      final response = await http.post(Uri.parse(endpoint),
+          body: jsonEncode(body),
+          headers: {'Content-Type': 'application/json'});
 
       if (response.statusCode == 201) {
         print("Todo Created");

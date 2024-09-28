@@ -4,7 +4,7 @@ class Todo extends Equatable {
   String? id;
   String title;
   String description;
-   bool? isCompleted;
+  bool? isCompleted;
 
   Todo({
     this.id,

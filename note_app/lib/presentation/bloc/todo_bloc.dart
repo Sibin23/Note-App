@@ -1,37 +1,40 @@
-import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:http/http.dart';
+import 'package:note_app/core/navigation/navigation_service.dart';
 import 'package:note_app/domain/models/todo_model.dart';
 import 'package:note_app/domain/services/todo_services.dart';
+
 part 'todo_event.dart';
 part 'todo_state.dart';
 
-class TodoBloc extends Bloc<TodoEvent, TodoState> {
+class TodoBloc extends Bloc<NoteEvent, TodoState> {
   TodoBloc() : super(TodoInitial()) {
-    on<TodoEvent>((event, emit) async {
-      if (event == TodoEvent.fetchTodos) {
+    on<NoteEvent>((event, emit) async {
+      if (event is GetallNotesEvent) {
         emit(TodoLoading());
         try {
           final response = await ApiServices.fetchTodos();
           print("Response is ${response}");
-          final List<Todo> todos = response;
-          emit(TodoLoaded(todos));
+
+          emit(TodoSuccess(response));
         } catch (e) {
           emit(TodoError(message: e.toString()));
         }
-      } else if (event == TodoEvent.createTodo) {
-        // Handle creating a new Todo
+      } else if (event is NoteAddEvent) {
         emit(TodoLoading());
         try {
           await ApiServices.createTodo(Todo(
-            title: 'New Todo', // Provide a default title (optional)
-            description: '', // Allow empty description for now
-            isCompleted: false,
-          ));
-
+              title: event.title,
+              description: event.description,
+              isCompleted: event.isCompleted));
+          final response = await ApiServices.fetchTodos();
+          emit(TodoSuccess(response));
+          NavigationService.instance.goBack();
           // Optional: Update loaded todos after creation
           // You might need to fetch todos again or update the state locally
 
-          // emit(const TodoLoaded([])); // This might not be necessary
+          // emit(const TodoSuccess([])); // This might not be necessary
         } catch (e) {
           emit(TodoError(message: e.toString()));
         }
