@@ -9,19 +9,26 @@ class NavigationService {
     navigationKey = GlobalKey<NavigatorState>();
   }
 
-  navigate(Widget rn,[ VoidCallback? voidCallback]) {
+  navigate(Widget rn, [VoidCallback? voidCallback]) {
     navigationKey.currentState!
-        .push(MaterialPageRoute(builder: (context) => rn)).then((value) {
-          voidCallback!();
-        },);
+        .push(MaterialPageRoute(builder: (context) => rn))
+        .then(
+      (value) {
+        voidCallback!();
+      },
+    );
   }
 
-  navigateUntil(Widget screen) {
-    navigationKey.currentState!.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (ctx) => screen), (route) => false);
+  navigateUntil(Widget screen, [VoidCallback? voidCallback]) {
+    navigationKey.currentState!
+        .pushAndRemoveUntil(
+            MaterialPageRoute(builder: (ctx) => screen), (route) => false)
+        .then((value) {
+      voidCallback!();
+    });
   }
 
   goBack() {
-     navigationKey.currentState!.pop();
+    navigationKey.currentState!.pop();
   }
 }

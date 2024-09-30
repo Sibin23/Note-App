@@ -6,7 +6,6 @@ import 'package:note_app/core/navigation/navigation_service.dart';
 import 'package:note_app/presentation/bloc/todo_bloc.dart';
 import 'package:note_app/presentation/screens/add_screen/screen_todo_add.dart';
 import 'package:note_app/presentation/screens/home/widget/todo_card_widget.dart';
-import 'package:note_app/presentation/screens/todo_screen/screen_todo.dart';
 
 class ScreenHome extends StatelessWidget {
   const ScreenHome({super.key});

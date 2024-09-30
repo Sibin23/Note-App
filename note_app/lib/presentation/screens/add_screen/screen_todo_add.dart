@@ -1,10 +1,11 @@
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:note_app/core/constants/colors.dart';
 import 'package:note_app/core/constants/constants.dart';
 import 'package:note_app/core/navigation/navigation_service.dart';
 import 'package:note_app/presentation/bloc/todo_bloc.dart';
+import 'package:note_app/presentation/screens/home/screen_home.dart';
 
 class ScreenTodoAdd extends StatefulWidget {
   const ScreenTodoAdd({
@@ -119,19 +120,21 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                                 if (state is TodoSuccess) {
                                   titleController.clear();
                                   descriptionController.clear();
-                                  NavigationService.instance.goBack();
+                                  NavigationService.instance.navigateUntil(
+                                    const ScreenHome(),
+                                  );
                                   customSnackBar(
                                       context,
+                                      'Success',
                                       "Todo Added Successfully",
-                                      greenColor,
-                                      blackColor);
+                                      AnimatedSnackBarType.success);
                                 }
                                 if (state is TodoError) {
                                   customSnackBar(
                                       context,
+                                      'Error',
                                       "Failed To Create Todo",
-                                      redColor,
-                                      blackColor);
+                                      AnimatedSnackBarType.error);
                                 }
                               }
                             },
@@ -149,14 +152,4 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
           ),
         ));
   }
-}
-
-customSnackBar(
-    BuildContext context, String message, Color bg, Color textColor) {
-  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: bg,
-      content: Text(
-        message,
-        style: GoogleFonts.roboto(color: textColor),
-      )));
 }

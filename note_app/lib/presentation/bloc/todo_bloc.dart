@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:note_app/domain/models/todo_model.dart';
 import 'package:note_app/domain/services/todo_services.dart';
 
@@ -14,10 +13,6 @@ class TodoBloc extends Bloc<NoteEvent, TodoState> {
         emit(TodoLoading());
         try {
           final response = await ApiServices.fetchTodos();
-          if (kDebugMode) {
-            print("Response is $response");
-          }
-
           emit(TodoSuccess(response));
         } catch (e) {
           emit(TodoError(message: e.toString()));
@@ -30,11 +25,19 @@ class TodoBloc extends Bloc<NoteEvent, TodoState> {
               isCompleted: event.isCompleted));
           final response = await ApiServices.fetchTodos();
           emit(TodoSuccess(response));
-         
-          // Optional: Update loaded todos after creation
-          // You might need to fetch todos again or update the state locally
-
-          // emit(const TodoSuccess([])); // This might not be necessary
+        } catch (e) {
+          emit(TodoError(message: e.toString()));
+        }
+      } else if (event is TodoUpdateEvent) {
+        try {
+          emit(TodoLoading());
+          await ApiServices.updateTodo(Todo(
+              id: event.id,
+              title: event.title,
+              description: event.description,
+              isCompleted: event.isCompleted));
+          final response = await ApiServices.fetchTodos();
+          emit(TodoSuccess(response));
         } catch (e) {
           emit(TodoError(message: e.toString()));
         }

@@ -16,9 +16,15 @@ class NoteAddEvent extends NoteEvent {
 }
 
 class TodoUpdateEvent extends NoteEvent {
-  final Todo todo;
+  final String id;
+  final String title;
+  final String description;
+  final bool isCompleted;
   TodoUpdateEvent({
-    required this.todo,
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.isCompleted,
   });
 }
 

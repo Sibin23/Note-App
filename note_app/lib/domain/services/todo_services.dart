@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:note_app/core/constants/strings.dart';
 import 'package:note_app/domain/models/todo_model.dart';
 
 class ApiServices {
@@ -64,7 +63,7 @@ class ApiServices {
       'is_completed': todo.isCompleted,
     };
     try {
-      final response = await http.put(Uri.parse(baseUrl + todo.id.toString()),
+      final response = await http.put(Uri.parse('$endpoint/${todo.id}'),
           body: jsonEncode(body),
           headers: {'Content-Type': 'application/json'});
       if (response.statusCode == 201) {
@@ -86,7 +85,7 @@ class ApiServices {
 
   static Future<void> deleteTodo(String id) async {
     try {
-      final response = await http.delete(Uri.parse('$baseUrl/$id'));
+      final response = await http.delete(Uri.parse('$endpoint/$id'));
       if (response.statusCode == 200) {
         if (kDebugMode) {
           print("Todo Deleted");

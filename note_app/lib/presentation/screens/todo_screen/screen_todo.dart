@@ -1,3 +1,4 @@
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,7 +7,6 @@ import 'package:note_app/core/constants/constants.dart';
 import 'package:note_app/core/navigation/navigation_service.dart';
 import 'package:note_app/domain/models/todo_model.dart';
 import 'package:note_app/presentation/bloc/todo_bloc.dart';
-import 'package:note_app/presentation/screens/add_screen/screen_todo_add.dart';
 import 'package:note_app/presentation/screens/edit_screen/screen_todo_edit.dart';
 import 'package:note_app/presentation/screens/home/screen_home.dart';
 
@@ -78,8 +78,11 @@ class ScreenTodo extends StatelessWidget {
                                         .add(TodoDeleteEvent(id: todo.id!));
                                     NavigationService.instance
                                         .navigateUntil(const ScreenHome());
-                                    customSnackBar(context, "Todo Deleted ..!",
-                                        redColor, blackColor);
+                                    customSnackBar(
+                                        context,
+                                        'Deleted',
+                                        "Todo Deleted Successfully!",
+                                        AnimatedSnackBarType.success);
                                   },
                                   child: const Text('Delete')),
                             ],
@@ -141,9 +144,8 @@ class ScreenTodo extends StatelessWidget {
           ),
           onPressed: () {
             NavigationService.instance.navigate(ScreenTodoEdit(
-                isCompleted: todo.isCompleted!,
-                title: todo.title,
-                description: todo.description));
+              todo: todo,
+            ));
           }),
     );
   }
