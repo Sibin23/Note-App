@@ -16,6 +16,7 @@ final titleTextStyle = GoogleFonts.roboto(
 void customSnackBar(BuildContext context, String statusMsg, String message,
     AnimatedSnackBarType snackbarType) {
   return AnimatedSnackBar.rectangle(
+    duration: const Duration(seconds: 2),
     statusMsg,
     message,
     type: snackbarType,

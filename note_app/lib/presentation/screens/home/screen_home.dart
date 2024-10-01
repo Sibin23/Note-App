@@ -16,6 +16,7 @@ class ScreenHome extends StatelessWidget {
     context.read<TodoBloc>().add(GetallNotesEvent());
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: appTheme,
         centerTitle: true,
         title: const Text("Todo List"),
       ),

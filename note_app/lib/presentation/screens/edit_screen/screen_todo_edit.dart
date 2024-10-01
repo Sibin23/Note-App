@@ -136,7 +136,6 @@ class _ScreenTodoEditState extends State<ScreenTodoEdit> {
                                       isCompleted: widget.todo.isCompleted!,
                                     ));
                                 if (state is TodoSuccess) {
-                                  print('hehehehe');
                                   titleController.clear();
                                   descriptionController.clear();
                                   widget.todo.isCompleted = false;
