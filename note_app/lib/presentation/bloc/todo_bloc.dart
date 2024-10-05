@@ -18,6 +18,7 @@ class TodoBloc extends Bloc<NoteEvent, TodoState> {
           emit(TodoError(message: e.toString()));
         }
       } else if (event is NoteAddEvent) {
+        emit(TodoLoading());
         try {
           await ApiServices.createTodo(Todo(
               title: event.title,

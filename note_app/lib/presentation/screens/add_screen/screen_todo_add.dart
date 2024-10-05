@@ -98,7 +98,7 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                   SizedBox(
                     width: size.width,
                     child: Center(
-                      child: BlocBuilder<TodoBloc, TodoState>(
+                      child: BlocConsumer<TodoBloc, TodoState>(
                         buildWhen: (previous, currentState) =>
                             currentState is NoteAddEvent,
                         builder: (context, state) {
@@ -117,31 +117,35 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                                     description:
                                         descriptionController.text.trim(),
                                     isCompleted: false));
-                                if (state is TodoSuccess) {
-                                  titleController.clear();
-                                  descriptionController.clear();
-                                  NavigationService.instance.navigateUntil(
-                                    const ScreenHome(),
-                                  );
-                                  customSnackBar(
-                                      context,
-                                      'Success',
-                                      "Todo Added Successfully",
-                                      AnimatedSnackBarType.success);
-                                }
-                                if (state is TodoError) {
-                                  customSnackBar(
-                                      context,
-                                      'Error',
-                                      "Failed To Create Todo",
-                                      AnimatedSnackBarType.error);
-                                }
                               }
                             },
                             child: Text(
                                 state is TodoLoading ? "Loading" : "Save",
                                 style: buttonText),
                           );
+                        },
+                        listenWhen: (previous, current) =>
+                            current is! NoteAddEvent,
+                        listener: (context, state) {
+                          if (state is TodoSuccess) {
+                            titleController.clear();
+                            descriptionController.clear();
+                            NavigationService.instance.navigateUntil(
+                              const ScreenHome(),
+                            );
+                            customSnackBar(
+                                context,
+                                'Success',
+                                "Todo Added Successfully",
+                                AnimatedSnackBarType.success);
+                          }
+                          if (state is TodoError) {
+                            customSnackBar(
+                                context,
+                                'Error',
+                                "Failed To Create Todo",
+                                AnimatedSnackBarType.error);
+                          }
                         },
                       ),
                     ),
