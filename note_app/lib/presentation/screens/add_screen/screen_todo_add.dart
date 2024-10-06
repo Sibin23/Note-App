@@ -101,6 +101,8 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                       child: BlocConsumer<TodoBloc, TodoState>(
                         buildWhen: (previous, currentState) =>
                             currentState is NoteAddEvent,
+                        listenWhen: (previous, current) =>
+                            current is! NoteAddEvent,
                         builder: (context, state) {
                           return MaterialButton(
                             elevation: 1,
@@ -124,8 +126,6 @@ class _ScreenTodoAddState extends State<ScreenTodoAdd> {
                                 style: buttonText),
                           );
                         },
-                        listenWhen: (previous, current) =>
-                            current is! NoteAddEvent,
                         listener: (context, state) {
                           if (state is TodoSuccess) {
                             titleController.clear();

@@ -33,3 +33,4 @@ class TodoDeleteEvent extends NoteEvent {
 
   TodoDeleteEvent({required this.id});
 }
+class  ButtonClickEvent extends NoteEvent {}
