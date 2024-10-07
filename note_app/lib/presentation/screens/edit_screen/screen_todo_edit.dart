@@ -114,56 +114,65 @@ class _ScreenTodoEditState extends State<ScreenTodoEdit> {
                   SizedBox(
                     width: size.width,
                     child: Center(
-                      child: BlocBuilder<TodoBloc, TodoState>(
-                        buildWhen: (previous, currentState) =>
-                            currentState is TodoUpdateEvent,
-                        builder: (context, state) {
-                          return MaterialButton(
-                            elevation: 1,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            splashColor: whitecolor,
-                            minWidth: size.width * 2 / 4,
-                            height: 50,
-                            color: Colors.grey.shade200,
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                context.read<TodoBloc>().add(TodoUpdateEvent(
-                                      id: widget.todo.id.toString(),
-                                      title: titleController.text.trim(),
-                                      description:
-                                          descriptionController.text.trim(),
-                                      isCompleted: widget.todo.isCompleted!,
-                                    ));
-                                if (state is TodoSuccess) {
-                                  titleController.clear();
-                                  descriptionController.clear();
-                                  widget.todo.isCompleted = false;
+                      child: BlocConsumer<TodoBloc, TodoState>(
+                        listener: (context, state) {
+                          if (state is TodoSuccess) {
+                            titleController.clear();
+                            descriptionController.clear();
+                            widget.todo.isCompleted = false;
 
-                                  NavigationService.instance.navigateUntil(
-                                    const ScreenHome(),
-                                    () {
-                                      context
-                                          .read<TodoBloc>()
-                                          .add(GetallNotesEvent());
-                                    },
-                                  );
-                                  customSnackBar(
-                                      context,
-                                      'Success',
-                                      "Todo Updated Successfully",
-                                      AnimatedSnackBarType.success);
-                                } else if (state is TodoError) {
-                                  customSnackBar(
-                                      context,'Error',
-                                      "Failed To Update Todo",
-                                     AnimatedSnackBarType.error);
-                                }
-                              }
+                            NavigationService.instance.navigateUntil(
+                              const ScreenHome(),
+                              () {
+                                context
+                                    .read<TodoBloc>()
+                                    .add(GetallNotesEvent());
+                              },
+                            );
+                            customSnackBar(
+                                context,
+                                'Success',
+                                "Todo Updated Successfully",
+                                AnimatedSnackBarType.success);
+                          } else if (state is TodoError) {
+                            customSnackBar(
+                                context,
+                                'Error',
+                                "Failed To Update Todo",
+                                AnimatedSnackBarType.error);
+                          }
+                        },
+                        builder: (context, state) {
+                          return BlocBuilder<TodoBloc, TodoState>(
+                            buildWhen: (previous, currentState) =>
+                                currentState is TodoUpdateEvent,
+                            builder: (context, state) {
+                              return MaterialButton(
+                                elevation: 1,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                splashColor: whitecolor,
+                                minWidth: size.width * 2 / 4,
+                                height: 50,
+                                color: Colors.grey.shade200,
+                                onPressed: () {
+                                  if (formKey.currentState!.validate()) {
+                                    context
+                                        .read<TodoBloc>()
+                                        .add(TodoUpdateEvent(
+                                          id: widget.todo.id.toString(),
+                                          title: titleController.text.trim(),
+                                          description:
+                                              descriptionController.text.trim(),
+                                          isCompleted: widget.todo.isCompleted!,
+                                        ));
+                                  }
+                                },
+                                child: Text(
+                                    state is TodoLoading ? "Loading" : "Save",
+                                    style: buttonText),
+                              );
                             },
-                            child: Text(
-                                state is TodoLoading ? "Loading" : "Save",
-                                style: buttonText),
                           );
                         },
                       ),
