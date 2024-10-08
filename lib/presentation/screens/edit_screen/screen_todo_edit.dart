@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:note_app/core/constants/colors.dart';
 import 'package:note_app/core/constants/constants.dart';
+import 'package:note_app/core/navigation/navigation_service.dart';
+import 'package:note_app/presentation/bloc/todo_bloc.dart';
+import 'package:note_app/presentation/screens/add_screen/screen_todo_add.dart';
 
 class ScreenTodoEdit extends StatefulWidget {
   const ScreenTodoEdit(
@@ -19,10 +23,13 @@ class ScreenTodoEdit extends StatefulWidget {
 class _ScreenTodoEditState extends State<ScreenTodoEdit> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+   bool? _isChecked;
   @override
   void initState() {
     titleController.text = widget.title;
     descriptionController.text = widget.description;
+    _isChecked = widget.isCompleted;
     super.initState();
   }
 
@@ -88,25 +95,55 @@ class _ScreenTodoEditState extends State<ScreenTodoEdit> {
                   ),
                 ),
                 h40,
-                SizedBox(
-                  width: size.width,
-                  child: Center(
-                    child: MaterialButton(
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      splashColor: whitecolor,
-                      minWidth: size.width * 2 / 4,
-                      height: 50,
-                      color: Colors.grey.shade200,
-                      onPressed: () {},
-                      child: Text(
-                        'Save',
-                        style: buttonText,
+               SizedBox(
+                    width: size.width,
+                    child: Center(
+                      child: BlocBuilder<TodoBloc, TodoState>(
+                        buildWhen: (previous, currentState) =>
+                            currentState is NoteAddEvent,
+                        builder: (context, state) {
+                          return MaterialButton(
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            splashColor: whitecolor,
+                            minWidth: size.width * 2 / 4,
+                            height: 50,
+                            color: Colors.grey.shade200,
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                context.read<TodoBloc>().add(NoteAddEvent(
+                                    title: titleController.text.trim(),
+                                    description:
+                                        descriptionController.text.trim(),
+                                    isCompleted: false));
+                                if (state is TodoSuccess) {
+                                  titleController.clear();
+                                  descriptionController.clear();
+                                  NavigationService.instance.goBack();
+                                  customSnackBar(
+                                      context,
+                                      "Todo Added Successfully",
+                                      greenColor,
+                                      blackColor);
+                                }
+                                if (state is TodoError) {
+                                  customSnackBar(
+                                      context,
+                                      "Failed To Create Todo",
+                                      redColor,
+                                      blackColor);
+                                }
+                              }
+                            },
+                            child: Text(
+                                state is TodoLoading ? "Loading" : "Save",
+                                style: buttonText),
+                          );
+                        },
                       ),
                     ),
                   ),
-                )
               ],
             ),
           ),
