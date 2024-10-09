@@ -141,6 +141,7 @@ class ScreenTodo extends StatelessWidget {
           ),
           onPressed: () {
             NavigationService.instance.navigate(ScreenTodoEdit(
+                id: todo.id!,
                 isCompleted: todo.isCompleted!,
                 title: todo.title,
                 description: todo.description));

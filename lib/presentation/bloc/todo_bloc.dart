@@ -30,11 +30,15 @@ class TodoBloc extends Bloc<NoteEvent, TodoState> {
               isCompleted: event.isCompleted));
           final response = await ApiServices.fetchTodos();
           emit(TodoSuccess(response));
-         
-          // Optional: Update loaded todos after creation
-          // You might need to fetch todos again or update the state locally
-
-          // emit(const TodoSuccess([])); // This might not be necessary
+        } catch (e) {
+          emit(TodoError(message: e.toString()));
+        }
+      } else if (event is TodoUpdateEvent) {
+        emit(TodoLoading());
+        try {
+          await ApiServices.updateTodo(event.todo);
+          final response = await ApiServices.fetchTodos();
+          emit(TodoSuccess(response));
         } catch (e) {
           emit(TodoError(message: e.toString()));
         }

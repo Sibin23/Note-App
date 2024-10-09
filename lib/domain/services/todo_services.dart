@@ -64,7 +64,7 @@ class ApiServices {
       'is_completed': todo.isCompleted,
     };
     try {
-      final response = await http.put(Uri.parse(baseUrl + todo.id.toString()),
+      final response = await http.put(Uri.parse('$endpoint/${todo.id}'),
           body: jsonEncode(body),
           headers: {'Content-Type': 'application/json'});
       if (response.statusCode == 201) {
